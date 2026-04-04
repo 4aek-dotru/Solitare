@@ -2,6 +2,9 @@
     margin: unset;
     padding: unset;
 }
+button {
+    cursor: pointer;
+}
 body {
     display: flex;
     height: 100vh;
@@ -27,7 +30,7 @@ main {
 footer {
     display: flex;
     justify-content: center;
-    padding: 10px;
+    padding: 30px;
 }
 #main-container {
     display: flex;
@@ -47,7 +50,7 @@ footer {
     font-size: 20px;
 }
 #rules-container {
-    display: flex;
+    display: none;
     flex-direction: column;
     justify-content: center;
     flex-wrap: wrap;
@@ -56,10 +59,39 @@ footer {
     border: 1px solid black;
     border-radius: 20px;
 }
-#main-menu-button {
+#main-menu-button, #main-menu-from-game-button {
+    display: none;
+    justify-content: center;
+    align-items: center;
     width: 120px;
     padding: 15px;
     border: 1px solid black;
     border-radius: 10px;
     font-size: 15px;
+}
+#game-container {
+    display: none;
+    flex-direction: column;
+    gap: 70px;
+}
+#header-game-container {
+    display: flex;
+    justify-content: space-between;
+}
+#deck-container {
+    display: flex;
+    gap: 10px;
+}
+#close-cards, #open-cards, .card-slot, .game-cell {
+    position: relative;
+    width: 90px;
+    height: 130px;
+    border-radius: 10px;
+}
+#close-cards:empty, #open-cards:empty, .card-slot:empty, .game-cell:empty {
+    border: 1px dashed black;
+}
+#card-slots, #main-game-container {
+    display: flex;
+    gap: 10px;
 }
