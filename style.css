@@ -26,6 +26,7 @@ main {
     justify-content: center;
     align-items: center;
     width: 100vw;
+    height: 100%;
 }
 footer {
     display: flex;
@@ -73,6 +74,7 @@ footer {
     display: none;
     flex-direction: column;
     gap: 70px;
+    height: 600px;
 }
 #header-game-container {
     display: flex;
@@ -89,9 +91,33 @@ footer {
     border-radius: 10px;
 }
 #close-cards:empty, #open-cards:empty, .card-slot:empty, .game-cell:empty {
-    border: 1px dashed black;
+    outline: 1px dashed black;
 }
 #card-slots, #main-game-container {
     display: flex;
     gap: 10px;
+}
+.card {
+    position: absolute;
+    width: 90px;
+    height: 130px;
+    border-radius: 10px;
+}
+.close {
+    background: grey;
+}
+.open {
+    background: blue;
+    animation: openCard 0.5s;
+}
+@keyframes openCard {
+    0% {
+        width: 90px;
+    }
+    50% {
+        width: 0px;
+    }
+    100% {
+        width: 90px;
+    }
 }
