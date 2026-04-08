@@ -79,6 +79,7 @@ export default class Game {
     }
     stopDrag(clone, card) {
         document.removeEventListener('mousemove', this.mouseMoveHandler)
+        document.removeEventListener('mouseup', this.mouseUpHandler)
         
         const cloneRect = clone.getBoundingClientRect();
         const centerCloneX = cloneRect.left + cloneRect.width / 2;
@@ -88,28 +89,43 @@ export default class Game {
         let parent;
         if(elementUnderClone.classList.contains('card')) {
             parent = elementUnderClone.parentNode;
+            if(parent === openCardsContainer || closeCardsContainer){
+                console.log('пипяу')
+                clone.remove();
+                card.style.opacity = '1';
+                return
+            }
             parent.appendChild(card);
             clone.remove();
             this.checkColumn(parent);
             card.style.opacity = '1';
         }else {
             parent = elementUnderClone;
+            console.log(parent.id)
+            if(parent.id == 'close-cards' || 'open-cards'){
+                console.log('пипяу')
+                console.log(openCardsContainer)
+                console.log(closeCardsContainer)
+                console.log(parent)
+                clone.remove();
+                card.style.opacity = '1';
+                return
+            }
             elementUnderClone.appendChild(card);
             clone.remove();
             this.checkColumn(parent);
             card.style.opacity = '1';
         }
-        document.removeEventListener('mouseup', this.mouseUpHandler)
     }
     checkColumn(parent) {
         console.log(parent.childNodes.length)
         const allChildrens = parent.childNodes;
         let i = 1;
-        allChildrens.forEach(child => {    
+        allChildrens.forEach(child => {
             child.style.zIndex = i;
             if(i == 1) {
                 i++
-                return   
+                return
             };
             child.style.top = 20 * (i - 1) + 'px';
             i++
