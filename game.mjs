@@ -68,6 +68,7 @@ export default class Game {
         console.log(this.CURRENT_CORDS_CARD.left)
         clone.style.left = this.CURRENT_CORDS_CARD.left + 'px';
         clone.style.top = this.CURRENT_CORDS_CARD.top + 'px';
+        clone.style.zIndex = '9999';
         card.style.opacity = '0';
         document.body.appendChild(clone);
         this.mouseUpHandler = (e) => this.stopDrag(clone, card);
