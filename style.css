@@ -109,7 +109,7 @@ footer {
 }
 .open {
     background: #0000ff;
-    animation: openCard 0.5s;
+    /* animation: openCard 0.5s; */
 }
 @keyframes openCard {
     0% {

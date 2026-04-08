@@ -6,6 +6,7 @@ const gameCellsContainer = document.querySelectorAll('.game-cell');
 export default class Game {
     CARDS = [];
     CURRENT_CARD;
+    CURRENT_CONTAINER;
     CURRENT_CORDS_CARD;
     CURRENT_CORDS_MOUSE;
     constructor() {
@@ -29,6 +30,7 @@ export default class Game {
     mouseDown(card) {
         card.addEventListener('mousedown', (e) => {
             this.CURRENT_CORDS_MOUSE = e;
+            this.CURRENT_CONTAINER = card.parentNode;
             if(card.classList.contains('open')) {
                 this.startDrag(card);
             }else {
@@ -65,7 +67,6 @@ export default class Game {
         let clone = card.cloneNode();
         clone.style.position = 'absolute';
         this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
-        console.log(this.CURRENT_CORDS_CARD.left)
         clone.style.left = this.CURRENT_CORDS_CARD.left + 'px';
         clone.style.top = this.CURRENT_CORDS_CARD.top + 'px';
         clone.style.zIndex = '9999';
@@ -84,55 +85,35 @@ export default class Game {
         const cloneRect = clone.getBoundingClientRect();
         const centerCloneX = cloneRect.left + cloneRect.width / 2;
         const centerCloneY = cloneRect.top + cloneRect.height / 2;
-        console.log(document.elementsFromPoint(centerCloneX, centerCloneY))
         const elementUnderClone = document.elementsFromPoint(centerCloneX, centerCloneY)[1];
         let parent;
-        if(elementUnderClone.classList.contains('card')) {
-            parent = elementUnderClone.parentNode;
-            if(parent === openCardsContainer || closeCardsContainer){
-                console.log('пипяу')
-                clone.remove();
-                card.style.opacity = '1';
-                return
-            }
+        if(elementUnderClone.classList.contains('card')) parent = elementUnderClone.parentNode;
+            else parent = elementUnderClone;
+        if(parent.dataset.dragContainer === '1'){
             parent.appendChild(card);
             clone.remove();
             this.checkColumn(parent);
             card.style.opacity = '1';
-        }else {
-            parent = elementUnderClone;
-            console.log(parent.id)
-            if(parent.id == 'close-cards' || 'open-cards'){
-                console.log('пипяу')
-                console.log(openCardsContainer)
-                console.log(closeCardsContainer)
-                console.log(parent)
-                clone.remove();
-                card.style.opacity = '1';
-                return
-            }
-            elementUnderClone.appendChild(card);
-            clone.remove();
-            this.checkColumn(parent);
-            card.style.opacity = '1';
+            this.checkColumn(this.CURRENT_CONTAINER);
+            return;
         }
+        this.cancelDrag(clone, card);
+    }
+    cancelDrag(clone, card) {
+        clone.remove();
+        card.style.opacity = '1';
     }
     checkColumn(parent) {
-        console.log(parent.childNodes.length)
         const allChildrens = parent.childNodes;
         let i = 1;
         allChildrens.forEach(child => {
             child.style.zIndex = i;
-            if(i == 1) {
-                i++
-                return
-            };
-            child.style.top = 20 * (i - 1) + 'px';
+            if(i == 1) child.style.top = 0 + 'px';
+            if(i > 1) child.style.top = 20 * (i - 1) + 'px';
+            child.style.pointerEvents = 'none';
+            if(i == allChildrens.length) child.style.pointerEvents = 'auto';
             i++
-            console.log(child)
         });
-        console.log(parent)
-        console.log(parent.childNodes)
     }
     moveClone(clone, e) {
         let differentY = this.CURRENT_CORDS_MOUSE.pageY - e.pageY;
