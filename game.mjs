@@ -85,19 +85,38 @@ export default class Game {
         const centerCloneY = cloneRect.top + cloneRect.height / 2;
         console.log(document.elementsFromPoint(centerCloneX, centerCloneY))
         const elementUnderClone = document.elementsFromPoint(centerCloneX, centerCloneY)[1];
+        let parent;
         if(elementUnderClone.classList.contains('card')) {
-            let parent = elementUnderClone.parentNode
-            console.log(parent)
+            parent = elementUnderClone.parentNode;
             parent.appendChild(card);
             clone.remove();
+            this.checkColumn(parent);
             card.style.opacity = '1';
-            console.log(parent);
         }else {
+            parent = elementUnderClone;
             elementUnderClone.appendChild(card);
             clone.remove();
+            this.checkColumn(parent);
             card.style.opacity = '1';
         }
         document.removeEventListener('mouseup', this.mouseUpHandler)
+    }
+    checkColumn(parent) {
+        console.log(parent.childNodes.length)
+        const allChildrens = parent.childNodes;
+        let i = 1;
+        allChildrens.forEach(child => {    
+            child.style.zIndex = i;
+            if(i == 1) {
+                i++
+                return   
+            };
+            child.style.top = 20 * (i - 1) + 'px';
+            i++
+            console.log(child)
+        });
+        console.log(parent)
+        console.log(parent.childNodes)
     }
     moveClone(clone, e) {
         let differentY = this.CURRENT_CORDS_MOUSE.pageY - e.pageY;
