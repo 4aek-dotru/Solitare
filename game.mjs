@@ -89,27 +89,29 @@ export default class Game {
         let parent;
         if(elementUnderClone.classList.contains('card')) parent = elementUnderClone.parentNode;
             else parent = elementUnderClone;
-        if(parent.dataset.dragContainer === '1'){
-            parent.appendChild(card);
-            clone.remove();
-            this.checkColumn(parent);
-            card.style.opacity = '1';
-            this.checkColumn(this.CURRENT_CONTAINER);
-            return;
+        if(parent.dataset.dragContainer != '1' && parent.dataset.dragContainer != '2') {
+            this.cancelDrag(clone, card);
+            return
         }
-        this.cancelDrag(clone, card);
+        parent.appendChild(card);
+        clone.remove();
+        parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
+        card.style.opacity = '1';
+        this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
     }
     cancelDrag(clone, card) {
         clone.remove();
         card.style.opacity = '1';
     }
-    checkColumn(parent) {
+    checkColumn(parent, isGameCell) {
         const allChildrens = parent.childNodes;
         let i = 1;
         allChildrens.forEach(child => {
             child.style.zIndex = i;
-            if(i == 1) child.style.top = 0 + 'px';
-            if(i > 1) child.style.top = 20 * (i - 1) + 'px';
+            if(isGameCell) {
+                if(i == 1) child.style.top = 0 + 'px';
+                if(i > 1) child.style.top = 20 * (i - 1) + 'px';
+            }else child.style.top = 0 + 'px';
             child.style.pointerEvents = 'none';
             if(i == allChildrens.length) child.style.pointerEvents = 'auto';
             i++
