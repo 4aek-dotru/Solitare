@@ -14,7 +14,7 @@ export default class Game {
     CARDS_SETTINGS = {};
     ALL_CARDS = [];
     CURRENT_CLONES = [];
-    DRAGGED_CARDS = [];
+    DRAGGED_CARDS;
     CURRENT_CARD;
     CURRENT_CONTAINER;
     CURRENT_CORDS_CARD;
@@ -89,26 +89,30 @@ export default class Game {
         }
     }
     startDrag(card) {
+        this.DRAGGED_CARDS = [];
         const parent = card.parentNode;
-        const currentIndex = card.dataset.zIndex;
-        // parent.forEach(card => {
-        //     if(card.dataset.zIndex >= currentIndex){
-                
-        //     }
-        // });
-        let clone = card.cloneNode();
-        clone.style.position = 'absolute';
-        this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
-        clone.style.left = this.CURRENT_CORDS_CARD.left + 'px';
-        clone.style.top = this.CURRENT_CORDS_CARD.top + 'px';
-        clone.style.zIndex = '9999';
-        card.style.opacity = '0';
-        document.body.appendChild(clone);
-        this.mouseUpHandler = (e) => this.stopDrag(clone, card);
-        document.addEventListener('mouseup', this.mouseUpHandler);
-
-        this.mouseMoveHandler = (e) => this.moveClone(clone, e)
-        document.addEventListener('mousemove', this.mouseMoveHandler)
+        const currentIndex = card.style.zIndex;
+        parent.querySelectorAll(`.open`).forEach(card => {
+            if(card.style.zIndex >= Number(currentIndex)) this.DRAGGED_CARDS.push(card)
+        });
+        this.createClones();
+    }
+    createClones() {
+        this.DRAGGED_CARDS.forEach(card => {
+            let clone = card.cloneNode();
+            clone.style.position = 'absolute';
+            this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
+            clone.style.left = this.CURRENT_CORDS_CARD.left + 'px';
+            clone.style.top = this.CURRENT_CORDS_CARD.top + 'px';
+            clone.style.zIndex = '9999';
+            card.style.opacity = '0';
+            document.body.appendChild(clone);
+            
+            this.mouseUpHandler = (e) => this.stopDrag(clone, card);
+            document.addEventListener('mouseup', this.mouseUpHandler);
+            this.mouseMoveHandler = (e) => this.moveClone(clone, e)
+            document.addEventListener('mousemove', this.mouseMoveHandler)
+        });
     }
     stopDrag(clone, card) {
         document.removeEventListener('mousemove', this.mouseMoveHandler)
