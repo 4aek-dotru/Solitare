@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solitare</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>SOLITARE</h1>
+    </header>
+    <main>
+        <div id="main-container">
+            <button id="start-game-button">Играть</button>
+            <button id="rules-button">Правила</button>
+        </div>
+        <div id="rules-container">
+            <h1>Соберите все карты на основаниях.</h1>
+            <h3>Основания (справа сверху)</h3>
+            <li>В пустую ячейку можно положить туза.</li>
+            <li>На карту можно положить карту той же масти на единицу большего достоинства.</li>
+            <h3>Игровые ячейки</h3>
+            <li>На карту можно положить карту другого цвета масти на единицу меньшего достоинства вместе с картами, лежащими на ней.</li>
+            <li>Убывающую последовательность карт с чередованием цвета масти можно перетаскивать.</li>
+            <li>В пустую ячейку можно положить короля.</li>
+            <h3>Колоду можно просматривать много раз</h3>
+        </div>
+        <div id="game-container">
+            <div id="header-game-container">
+                <div id="deck-container">
+                    <div id="close-cards"></div>
+                    <div id="open-cards"></div>
+                </div>
+                <div id="card-slots">
+                    <div data-drag-container="2" class="card-slot"></div>
+                    <div data-drag-container="2" class="card-slot"></div>
+                    <div data-drag-container="2" class="card-slot"></div>
+                    <div data-drag-container="2" class="card-slot"></div>
+                </div>
+            </div>
+            <div id="main-game-container">
+                <div data-drag-container="1" class="game-cell"></div>
+                <div data-drag-container="1" class="game-cell"></div>
+                <div data-drag-container="1" class="game-cell"></div>
+                <div data-drag-container="1" class="game-cell"></div>
+                <div data-drag-container="1" class="game-cell"></div>
+                <div data-drag-container="1" class="game-cell"></div>
+                <div data-drag-container="1" class="game-cell"></div>
+            </div>
+        </div>
+    </main>
+    <footer>
+        <button id="main-menu-button">Назад</button>
+        <button id="main-menu-from-game-button">В меню</button>
+    </footer>
+    <script type="module" src="main.mjs"></script>
+</body>
+</html>
