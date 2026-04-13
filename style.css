@@ -106,8 +106,10 @@ footer {
 }
 .close {
     background: #808080;
+    pointer-events: none;
 }
 .open {
+    pointer-events: auto;
     background: #0000ff;
     /* animation: openCard 0.5s; */
 }

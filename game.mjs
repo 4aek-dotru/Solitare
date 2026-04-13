@@ -8,10 +8,13 @@ const suits = [
     { name: "Hearts", group: "RED" },
     { name: "Diamonds", group: "RED" }
 ];
-const ranks = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14"];
+const ranks = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
 
 export default class Game {
     CARDS_SETTINGS = {};
+    ALL_CARDS = [];
+    CURRENT_CLONES = [];
+    DRAGGED_CARDS = [];
     CURRENT_CARD;
     CURRENT_CONTAINER;
     CURRENT_CORDS_CARD;
@@ -23,7 +26,7 @@ export default class Game {
 
     createCards() {
         for(let i = 0; i < 52; i++) {
-            const rowCard = document.createElement('div')
+            const rowCard = document.createElement('div');
             rowCard.style.zIndex = i + 1;
             rowCard.classList.add('card');
             rowCard.classList.add('close');
@@ -32,23 +35,20 @@ export default class Game {
             rowCard.ondragstart = function() {
                 return false;
             };
+            this.ALL_CARDS.push(rowCard);
             this.mouseDownHandler = (e) => this.mouseDown(rowCard, e);
             rowCard.addEventListener('mousedown', this.mouseDownHandler);
         }
-        this.randomCardsSettings()
+        this.randomCardsSettings();
+        this.shuffleCards();
     }
     mouseDown(card, e) {
         this.CURRENT_CORDS_MOUSE = e;
         this.CURRENT_CONTAINER = card.parentNode;
-        if(card.classList.contains('open')) {
-            this.startDrag(card);
-        }else {
-            if(card.parentNode == closeCardsContainer) {
-                this.moveToOpenContainer(card);
-            }
-        }
+        this.startDrag(card);
     }
-    moveToOpenContainer(card) {
+    moveToOpenContainer(parent) {
+        const card = parent.childNodes[parent.childNodes.length - 1];
         let clone = card.cloneNode();
         clone.style.position = 'absolute';
         this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
@@ -89,6 +89,13 @@ export default class Game {
         }
     }
     startDrag(card) {
+        const parent = card.parentNode;
+        const currentIndex = card.dataset.zIndex;
+        // parent.forEach(card => {
+        //     if(card.dataset.zIndex >= currentIndex){
+                
+        //     }
+        // });
         let clone = card.cloneNode();
         clone.style.position = 'absolute';
         this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
@@ -106,7 +113,6 @@ export default class Game {
     stopDrag(clone, card) {
         document.removeEventListener('mousemove', this.mouseMoveHandler)
         document.removeEventListener('mouseup', this.mouseUpHandler)
-        
         const cloneRect = clone.getBoundingClientRect();
         const centerCloneX = cloneRect.left + cloneRect.width / 2;
         const centerCloneY = cloneRect.top + cloneRect.height / 2;
@@ -119,13 +125,13 @@ export default class Game {
             this.cancelDrag(clone, card);
             return
         }
-        this.checkCardsInCell(card, parent, clone)
+        parent.classList.contains('game-cell') ? this.checkCardsInCell(card, parent, clone, 1) : this.checkCardsInCell(card, parent, clone, 0)
     }
     cancelDrag(clone, card) {
         clone.remove();
         card.style.opacity = '1';
     }
-    checkColumn(parent, isGameCell) {
+    checkColumn(parent, isGameCell, isShuffle = false) {
         const allChildrens = parent.childNodes;
         let i = 1;
         allChildrens.forEach(child => {
@@ -134,8 +140,11 @@ export default class Game {
                 if(i == 1) child.style.top = 0 + 'px';
                 if(i > 1) child.style.top = 20 * (i - 1) + 'px';
             }else child.style.top = 0 + 'px';
-            child.style.pointerEvents = 'none';
-            if(i == allChildrens.length) child.style.pointerEvents = 'auto';
+            if(allChildrens[allChildrens.length - 1].classList.contains('close') &&
+            Number(parent.dataset.dragContainer) == 1 &&
+            isShuffle == false) {
+                this.openCard(allChildrens[allChildrens.length - 1]);
+            }
             i++
         });
     }
@@ -176,40 +185,84 @@ export default class Game {
         if(card.dataset.suitGroup == "BLACK") card.style.color = "white"
         card.innerHTML = `${card.dataset.rank}`;
     }
-    checkCardsInCell(card, parent, clone) {
+    checkCardsInCell(card, parent, clone, gameCell) {
         const childs = parent.childNodes;
         const lastChild = childs[childs.length - 1]
         if(lastChild != undefined) {
-            if(card.dataset.suitGroup != lastChild.dataset.suitGroup && Number(lastChild.dataset.rank) - Number(card.dataset.rank) == 1) {
-                parent.appendChild(card);
-                parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
-                card.style.opacity = '1';
-                this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
-                clone.remove();
+            if(gameCell) {
+                if(card.dataset.suitGroup != lastChild.dataset.suitGroup && Number(lastChild.dataset.rank) - Number(card.dataset.rank) == 1) {
+                    parent.appendChild(card);
+                    parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
+                    card.style.opacity = '1';
+                    this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
+                    clone.remove();
+                }else {
+                    this.cancelDrag(clone, card)
+                }
             }else {
-                this.cancelDrag(clone, card)
+                if(card.dataset.suit == lastChild.dataset.suit && Number(lastChild.dataset.rank) - Number(card.dataset.rank) == -1) {
+                    parent.appendChild(card);
+                    parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
+                    card.style.opacity = '1';
+                    this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
+                    clone.remove();
+                }else {
+                    this.cancelDrag(clone, card)
+                }
             }
         }else {
-            if(Number(card.dataset.rank) == 13) {
-                parent.appendChild(card);
-                parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
-                card.style.opacity = '1';
-                this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
-                clone.remove()
+            if(gameCell) {
+                if(Number(card.dataset.rank) == 13) {
+                    parent.appendChild(card);
+                    parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
+                    card.style.opacity = '1';
+                    this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
+                    clone.remove()
+                }else {
+                    this.cancelDrag(clone, card)
+                }
             }else {
-                this.cancelDrag(clone, card)
+                if(Number(card.dataset.rank) == 1) {
+                    parent.appendChild(card);
+                    parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
+                    card.style.opacity = '1';
+                    this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
+                    clone.remove()
+                }else {
+                    this.cancelDrag(clone, card)
+                }
             }
         }
     }
-    returnCards() {
+    returnCards(e) {
         if(closeCardsContainer.children.length == 0){
             const allChildrens = openCardsContainer.childNodes;
             for (let i = allChildrens.length - 1; i > -1; i--) {
-                closeCardsContainer.appendChild(allChildrens[i])
+                allChildrens[i].style.pointerEvents = "none";
+                closeCardsContainer.appendChild(allChildrens[i]);
             }
-
+            console.log('sfgfgdfg')
             this.closeCard();
             this.checkColumn(closeCardsContainer, false)
+        }else {
+            console.log(e.currentTarget)
+            this.moveToOpenContainer(e.currentTarget)
+        }
+    }
+    shuffleCards(){
+        let wastedCards = 0;
+        for(let i = 0; i < 7; i++) {
+            for(let k = 0; k < 7; k++) {
+                if(i > k) continue
+                const currentContainer = gameCellsContainer[k];
+                currentContainer.appendChild(this.ALL_CARDS[51 - wastedCards])
+                wastedCards++;
+                if(i == k) {
+                    this.checkColumn(currentContainer, true)
+                    continue
+                }
+                this.checkColumn(currentContainer, true, true)
+            }
         }
     }
 }
