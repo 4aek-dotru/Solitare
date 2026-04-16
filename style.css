@@ -1,6 +1,7 @@
 * {
     margin: unset;
     padding: unset;
+    user-select: none;
 }
 button {
     cursor: pointer;

@@ -95,24 +95,27 @@ export default class Game {
         parent.querySelectorAll(`.open`).forEach(card => {
             if(card.style.zIndex >= Number(currentIndex)) this.DRAGGED_CARDS.push(card)
         });
-        this.createClones();
+        this.createClones(card);
     }
-    createClones() {
+    createClones(card) {
+        let i = 0;
+        this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
         this.DRAGGED_CARDS.forEach(card => {
             let clone = card.cloneNode();
             clone.style.position = 'absolute';
-            this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
             clone.style.left = this.CURRENT_CORDS_CARD.left + 'px';
-            clone.style.top = this.CURRENT_CORDS_CARD.top + 'px';
+            clone.style.top = this.CURRENT_CORDS_CARD.top + (20 * i) + 'px';
             clone.style.zIndex = '9999';
             card.style.opacity = '0';
             document.body.appendChild(clone);
+            this.CURRENT_CLONES.push(clone);
             
-            this.mouseUpHandler = (e) => this.stopDrag(clone, card);
-            document.addEventListener('mouseup', this.mouseUpHandler);
-            this.mouseMoveHandler = (e) => this.moveClone(clone, e)
-            document.addEventListener('mousemove', this.mouseMoveHandler)
+            i++
         });
+        this.mouseUpHandler = (e) => this.stopDrag(this.CURRENT_CLONES[0], this.DRAGGED_CARDS[0]);
+        document.addEventListener('mouseup', this.mouseUpHandler);
+        this.mouseMoveHandler = (e) => this.moveClone(this.CURRENT_CLONES[0], e)
+        document.addEventListener('mousemove', this.mouseMoveHandler);
     }
     stopDrag(clone, card) {
         document.removeEventListener('mousemove', this.mouseMoveHandler)
@@ -120,20 +123,44 @@ export default class Game {
         const cloneRect = clone.getBoundingClientRect();
         const centerCloneX = cloneRect.left + cloneRect.width / 2;
         const centerCloneY = cloneRect.top + cloneRect.height / 2;
-        const elementUnderClone = document.elementsFromPoint(centerCloneX, centerCloneY)[1];
-        let parent;
+        const elementsUnderClone = document.elementsFromPoint(centerCloneX, centerCloneY);
+        let parent = null;
 
-        if(elementUnderClone.classList.contains('card')) parent = elementUnderClone.parentNode;
-            else parent = elementUnderClone;
-        if(parent.dataset.dragContainer != '1' && parent.dataset.dragContainer != '2') {
+        for(let element of elementsUnderClone) {
+            if(element === clone || element === document.body){
+                continue;
+            }
+            const dragContainer = element.closest(`[data-drag-container]`)
+            if(dragContainer) {
+                if(dragContainer.dataset.dragContainer == 1 || dragContainer.dataset.dragContainer == 2) {
+                    parent = dragContainer;
+                    break;
+                }
+            }
+            if(element.classList?.contains('game-cell')) {
+                parent = element;
+                break;
+            }
+            if(element.id == 'open-cards') {
+                parent = element;
+                break;
+            }
+        }
+        if(!parent) {
             this.cancelDrag(clone, card);
             return
         }
-        parent.classList.contains('game-cell') ? this.checkCardsInCell(card, parent, clone, 1) : this.checkCardsInCell(card, parent, clone, 0)
+        parent.classList.contains('game-cell') ? this.checkCardsInCell(card, parent, clone, 1) : this.checkCardsInCell(card, parent, clone, 0);
+        
     }
     cancelDrag(clone, card) {
-        clone.remove();
-        card.style.opacity = '1';
+        this.CURRENT_CLONES.forEach(clone => {
+            clone.remove();
+        });
+        this.DRAGGED_CARDS.forEach(card => {
+            card.style.opacity = '1';
+        });
+        this.CURRENT_CLONES = [];
     }
     checkColumn(parent, isGameCell, isShuffle = false) {
         const allChildrens = parent.childNodes;
@@ -153,10 +180,21 @@ export default class Game {
         });
     }
     moveClone(clone, e) {
-        let differentY = this.CURRENT_CORDS_MOUSE.pageY - e.pageY;
-        let differentX = this.CURRENT_CORDS_MOUSE.pageX - e.pageX;
-        clone.style.left = this.CURRENT_CORDS_CARD.left - differentX + 'px';
-        clone.style.top = this.CURRENT_CORDS_CARD.top - differentY + 'px';
+        let i = 0;
+        let cloneCoordinates = this.CURRENT_CLONES[0].getBoundingClientRect()
+        this.CURRENT_CLONES.forEach(clone => {
+            if(i == 0) {
+                let differentY = this.CURRENT_CORDS_MOUSE.pageY - e.pageY;
+                let differentX = this.CURRENT_CORDS_MOUSE.pageX - e.pageX;
+    
+                clone.style.left = this.CURRENT_CORDS_CARD.left - differentX + 'px';
+                clone.style.top = this.CURRENT_CORDS_CARD.top - differentY + 'px';
+            }else {
+                clone.style.left = cloneCoordinates.left + 'px';
+                clone.style.top = cloneCoordinates.top + (20 * i) + 'px';
+            }
+            i++
+        });
     }
     randomCardsSettings() {
         let cardId = 1;
@@ -192,18 +230,25 @@ export default class Game {
     checkCardsInCell(card, parent, clone, gameCell) {
         const childs = parent.childNodes;
         const lastChild = childs[childs.length - 1]
+        console.log(1)
         if(lastChild != undefined) {
             if(gameCell) {
+                console.log(card)
                 if(card.dataset.suitGroup != lastChild.dataset.suitGroup && Number(lastChild.dataset.rank) - Number(card.dataset.rank) == 1) {
-                    parent.appendChild(card);
+                    this.DRAGGED_CARDS.forEach(card => {
+                        parent.appendChild(card);
+                        card.style.opacity = '1';
+                    });
                     parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
-                    card.style.opacity = '1';
                     this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
-                    clone.remove();
+                    this.CURRENT_CLONES.forEach(clone => {
+                        clone.remove();
+                    });
                 }else {
                     this.cancelDrag(clone, card)
                 }
             }else {
+                console.log(card)
                 if(card.dataset.suit == lastChild.dataset.suit && Number(lastChild.dataset.rank) - Number(card.dataset.rank) == -1) {
                     parent.appendChild(card);
                     parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
