@@ -151,7 +151,7 @@ export default class Game {
             return
         }
         parent.classList.contains('game-cell') ? this.checkCardsInCell(card, parent, clone, 1) : this.checkCardsInCell(card, parent, clone, 0);
-        
+        this.CURRENT_CLONES = [];
     }
     cancelDrag(clone, card) {
         this.CURRENT_CLONES.forEach(clone => {
@@ -233,7 +233,6 @@ export default class Game {
         console.log(1)
         if(lastChild != undefined) {
             if(gameCell) {
-                console.log(card)
                 if(card.dataset.suitGroup != lastChild.dataset.suitGroup && Number(lastChild.dataset.rank) - Number(card.dataset.rank) == 1) {
                     this.DRAGGED_CARDS.forEach(card => {
                         parent.appendChild(card);
@@ -248,13 +247,20 @@ export default class Game {
                     this.cancelDrag(clone, card)
                 }
             }else {
-                console.log(card)
+                if(this.CURRENT_CLONES.length > 1){
+                    this.cancelDrag(clone, card)
+                    return
+                }
                 if(card.dataset.suit == lastChild.dataset.suit && Number(lastChild.dataset.rank) - Number(card.dataset.rank) == -1) {
-                    parent.appendChild(card);
+                    this.DRAGGED_CARDS.forEach(card => {
+                        parent.appendChild(card);
+                        card.style.opacity = '1';
+                    });
                     parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
-                    card.style.opacity = '1';
                     this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
-                    clone.remove();
+                    this.CURRENT_CLONES.forEach(clone => {
+                        clone.remove();
+                    });
                 }else {
                     this.cancelDrag(clone, card)
                 }
@@ -262,21 +268,29 @@ export default class Game {
         }else {
             if(gameCell) {
                 if(Number(card.dataset.rank) == 13) {
-                    parent.appendChild(card);
+                    this.DRAGGED_CARDS.forEach(card => {
+                        parent.appendChild(card);
+                        card.style.opacity = '1';
+                    });
                     parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
-                    card.style.opacity = '1';
                     this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
-                    clone.remove()
+                    this.CURRENT_CLONES.forEach(clone => {
+                        clone.remove();
+                    });
                 }else {
                     this.cancelDrag(clone, card)
                 }
             }else {
                 if(Number(card.dataset.rank) == 1) {
-                    parent.appendChild(card);
+                    this.DRAGGED_CARDS.forEach(card => {
+                        parent.appendChild(card);
+                        card.style.opacity = '1';
+                    });
                     parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
-                    card.style.opacity = '1';
                     this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
-                    clone.remove()
+                    this.CURRENT_CLONES.forEach(clone => {
+                        clone.remove();
+                    });
                 }else {
                     this.cancelDrag(clone, card)
                 }
