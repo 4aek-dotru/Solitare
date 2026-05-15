@@ -114,6 +114,52 @@ footer {
     background: #0000ff;
     /* animation: openCard 0.5s; */
 }
+#end-game-container {
+    position: absolute;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background-color: #00000054;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100000;
+}
+#end-game-menu {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    border: #000000;
+    border-radius: 20px;
+    background-color: #464646f3;
+    padding: 20px;
+    width: 250px;
+    height: 300px;
+}
+#end-game-menu > h1 {
+    text-align: center;
+    color: #ffffff;
+}
+#end-game-menu > button {
+    background-color: rgba(110, 110, 110, 0.466);
+    border: none;
+    border-bottom: 1px solid black;
+    border-radius: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 150px;
+    height: 50px;
+    font-size: 15px;
+    color: white;
+}
+#end-game-menu > button:hover {
+    transform: translateY(-1px);
+}
+#end-game-menu > button:active {
+    box-shadow: inset 0 0 5px rgb(0 0 0 / 0.5);
+}
 @keyframes openCard {
     0% {
         width: 90px;

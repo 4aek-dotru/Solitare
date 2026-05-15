@@ -19,9 +19,23 @@ export default class Game {
     CURRENT_CONTAINER;
     CURRENT_CORDS_CARD;
     CURRENT_CORDS_MOUSE;
+    isAnimating;
     constructor() {
+        this.clearGame();
         this.createCards();
         closeCardsContainer.addEventListener('click', this.returnCards.bind(this))
+        this.isAnimating = false;
+    }
+
+    clearGame() {
+        document.getElementById('close-cards').innerHTML = '';
+        document.getElementById('open-cards').innerHTML = '';
+        document.querySelectorAll('.card-slot').forEach(slot => {
+            slot.innerHTML = '';
+        });
+        document.querySelectorAll('.game-cell').forEach(cell => {
+            cell.innerHTML = '';
+        });
     }
 
     createCards() {
@@ -43,11 +57,13 @@ export default class Game {
         this.shuffleCards();
     }
     mouseDown(card, e) {
+        if (this.isAnimating) return;
         this.CURRENT_CORDS_MOUSE = e;
         this.CURRENT_CONTAINER = card.parentNode;
         this.startDrag(card);
     }
     moveToOpenContainer(parent) {
+        if (this.isAnimating) return;
         const card = parent.childNodes[parent.childNodes.length - 1];
         let clone = card.cloneNode();
         clone.style.position = 'absolute';
@@ -72,11 +88,13 @@ export default class Game {
         }, 200)
     }
     openCard(card) {
+        if (this.isAnimating) return;
         card.classList.remove('close');
         card.classList.add('open');
         this.addRankAndSuit(card);
     }
     closeCard() {
+        if (this.isAnimating) return;
         const allChildrens = closeCardsContainer.childNodes;
         for (let i = allChildrens.length - 1; i > -1; i--) {
             allChildrens[i].innerHTML = '';
@@ -89,6 +107,7 @@ export default class Game {
         }
     }
     startDrag(card) {
+        if (this.isAnimating) return;
         this.DRAGGED_CARDS = [];
         const parent = card.parentNode;
         const currentIndex = card.style.zIndex;
@@ -98,6 +117,7 @@ export default class Game {
         this.createClones(card);
     }
     createClones(card) {
+        if (this.isAnimating) return;
         let i = 0;
         this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
         this.DRAGGED_CARDS.forEach(card => {
@@ -118,6 +138,7 @@ export default class Game {
         document.addEventListener('mousemove', this.mouseMoveHandler);
     }
     stopDrag(clone, card) {
+        if (this.isAnimating) return;
         document.removeEventListener('mousemove', this.mouseMoveHandler)
         document.removeEventListener('mouseup', this.mouseUpHandler)
         const cloneRect = clone.getBoundingClientRect();
@@ -154,13 +175,39 @@ export default class Game {
         this.CURRENT_CLONES = [];
     }
     cancelDrag(clone, card) {
+        this.isAnimating = true;
         this.CURRENT_CLONES.forEach(clone => {
-            clone.remove();
-        });
-        this.DRAGGED_CARDS.forEach(card => {
-            card.style.opacity = '1';
+            this.returnCardAnimation()
+            setTimeout(() => {
+                clone.remove();
+                this.DRAGGED_CARDS.forEach(card => {
+                    card.style.opacity = '1';
+                });
+                this.isAnimating = false;
+            }, 200)
         });
         this.CURRENT_CLONES = [];
+    }
+    returnCardAnimation() {
+        for(let i = 0; i < this.CURRENT_CLONES.length; i++){
+            const clone = this.CURRENT_CLONES[i];
+            const card = this.DRAGGED_CARDS[i];
+
+            const cordsClone = clone.getBoundingClientRect();
+            const cordsCard = card.getBoundingClientRect();
+
+            const deltaTop = cordsCard.top - cordsClone.top;
+            const deltaLeft = cordsCard.left - cordsClone.left;
+
+            clone.style.transition = 'transform 200ms ease';
+            clone.style.transform = `translate(${deltaLeft}px, ${deltaTop}px)`;
+
+            const onTransitionEnd = () => {
+                clone.style.transition = '';
+                clone.removeEventListener('transitionend', onTransitionEnd);
+            };
+            clone.addEventListener('transitionend', onTransitionEnd);
+        }
     }
     checkColumn(parent, isGameCell, isShuffle = false) {
         const allChildrens = parent.childNodes;
@@ -180,6 +227,7 @@ export default class Game {
         });
     }
     moveClone(clone, e) {
+        if (this.isAnimating) return;
         let i = 0;
         let cloneCoordinates = this.CURRENT_CLONES[0].getBoundingClientRect()
         this.CURRENT_CLONES.forEach(clone => {
@@ -225,9 +273,11 @@ export default class Game {
         card.dataset.suitGroup = this.CARDS_SETTINGS[Number(card.dataset.id) + 1].SUIT_GROUP;
         card.style.backgroundColor = `${card.dataset.suitGroup}`;
         if(card.dataset.suitGroup == "BLACK") card.style.color = "white"
+        if(card.dataset.suitGroup == "RED") card.style.color = "black"
         card.innerHTML = `${card.dataset.rank}`;
     }
     checkCardsInCell(card, parent, clone, gameCell) {
+        if (this.isAnimating) return;
         const childs = parent.childNodes;
         const lastChild = childs[childs.length - 1]
         console.log(1)
@@ -255,6 +305,7 @@ export default class Game {
                     this.DRAGGED_CARDS.forEach(card => {
                         parent.appendChild(card);
                         card.style.opacity = '1';
+                        this.finishGame();
                     });
                     parent.dataset.dragContainer == '1' ? this.checkColumn(parent, true) : this.checkColumn(parent, false)
                     this.CURRENT_CONTAINER.dataset.dragContainer == '1' ? this.checkColumn(this.CURRENT_CONTAINER, true) : this.checkColumn(this.CURRENT_CONTAINER, false);
@@ -297,7 +348,18 @@ export default class Game {
             }
         }
     }
+    finishGame() {
+        const allCardSlots = document.querySelectorAll('.card-slot');
+        let i = 0;
+        allCardSlots.forEach(cardSlot => {
+            if(cardSlot.childElementCount == 13) i++;
+        });
+        if(i == 4) {
+            document.getElementById('end-game-container').style.display = 'flex';
+        }
+    }
     returnCards(e) {
+        if (this.isAnimating) return;
         if(closeCardsContainer.children.length == 0){
             const allChildrens = openCardsContainer.childNodes;
             for (let i = allChildrens.length - 1; i > -1; i--) {
