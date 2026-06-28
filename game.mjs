@@ -3,10 +3,10 @@ const openCardsContainer = document.getElementById('open-cards');
 const cardSlotsContainer = document.querySelectorAll('.card-slot');
 const gameCellsContainer = document.querySelectorAll('.game-cell');
 const suits = [
-    { name: "Clubs", group: "BLACK" },
-    { name: "Spades", group: "BLACK" },
-    { name: "Hearts", group: "RED" },
-    { name: "Diamonds", group: "RED" }
+    { name: "clubs", group: "BLACK" },
+    { name: "spades", group: "BLACK" },
+    { name: "hearts", group: "RED" },
+    { name: "diamonds", group: "RED" }
 ];
 const ranks = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"];
 
@@ -92,6 +92,7 @@ export default class Game {
         card.classList.remove('close');
         card.classList.add('open');
         this.addRankAndSuit(card);
+        this.addBackgroundImage(card);
     }
     closeCard() {
         if (this.isAnimating) return;
@@ -99,12 +100,19 @@ export default class Game {
         for (let i = allChildrens.length - 1; i > -1; i--) {
             allChildrens[i].innerHTML = '';
             allChildrens[i].style.backgroundColor = '#808080';
+            allChildrens[i].style.backgroundImage = 'unset';
             allChildrens[i].classList.remove('open');
             allChildrens[i].classList.add('close');
             allChildrens[i].dataset.suitGroup = '';
             allChildrens[i].dataset.suit = '';
             allChildrens[i].dataset.rank = '';
         }
+    }
+    addBackgroundImage(card) {
+        let suit = card.dataset.suit;
+        let rank = card.dataset.rank;
+        card.style.backgroundImage = `url(images/${rank}_of_${suit}.png)`;
+        card.style.backgroundSize = 'contain';
     }
     startDrag(card) {
         if (this.isAnimating) return;
@@ -272,9 +280,7 @@ export default class Game {
         card.dataset.suit = this.CARDS_SETTINGS[Number(card.dataset.id) + 1].SUIT;
         card.dataset.suitGroup = this.CARDS_SETTINGS[Number(card.dataset.id) + 1].SUIT_GROUP;
         card.style.backgroundColor = `${card.dataset.suitGroup}`;
-        if(card.dataset.suitGroup == "BLACK") card.style.color = "white"
-        if(card.dataset.suitGroup == "RED") card.style.color = "black"
-        card.innerHTML = `${card.dataset.rank}`;
+
     }
     checkCardsInCell(card, parent, clone, gameCell) {
         if (this.isAnimating) return;
