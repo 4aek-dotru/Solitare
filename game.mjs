@@ -361,7 +361,6 @@ export default class Game {
                 card.classList.remove('open');
                 card.classList.add('close');
                 card.innerHTML = '';
-                card.style.backgroundColor = '#808080';
                 card.style.backgroundImage = 'unset';
                 card.dataset.suitGroup = '';
                 card.dataset.suit = '';
