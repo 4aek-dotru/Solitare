@@ -64,28 +64,24 @@ export default class Game {
     }
     moveToOpenContainer(parent) {
         if (this.isAnimating) return;
-        const card = parent.childNodes[parent.childNodes.length - 1];
-        let clone = card.cloneNode();
-        clone.style.position = 'absolute';
-        this.CURRENT_CORDS_CARD = card.getBoundingClientRect();
-        const targetCoordinates = openCardsContainer.getBoundingClientRect();
-        clone.style.left = this.CURRENT_CORDS_CARD.left + 'px';
-        clone.style.top = this.CURRENT_CORDS_CARD.top + 'px';
         
-        document.body.appendChild(clone);
-        card.style.opacity = '0';
-        card.style.pointerEvents = 'none';
-        clone.style.transform = `translate(${targetCoordinates.left - this.CURRENT_CORDS_CARD.left}px, ${targetCoordinates.top - this.CURRENT_CORDS_CARD.top})`
-    
-        setTimeout(() => {
-            clone.remove();
-            openCardsContainer.appendChild(card);
-            card.style.opacity = '1';
-            card.style.pointerEvents = 'auto';
-            this.openCard(card);
-            this.checkColumn(openCardsContainer, false)
-            this.checkColumn(closeCardsContainer, false)
-        }, 200)
+        const childs = parent.childNodes;
+        if (childs.length === 0) {
+            console.log('Нет карт в колоде');
+            return;
+        }
+
+        const card = childs[childs.length - 1];
+
+        if (!card.classList?.contains('card')) return;
+
+        openCardsContainer.appendChild(card);
+        card.style.opacity = '1';
+        card.style.pointerEvents = 'auto';
+
+        this.openCard(card);
+        this.checkColumn(openCardsContainer, false);
+        this.checkColumn(closeCardsContainer, false);
     }
     openCard(card) {
         if (this.isAnimating) return;
@@ -93,20 +89,6 @@ export default class Game {
         card.classList.add('open');
         this.addRankAndSuit(card);
         this.addBackgroundImage(card);
-    }
-    closeCard() {
-        if (this.isAnimating) return;
-        const allChildrens = closeCardsContainer.childNodes;
-        for (let i = allChildrens.length - 1; i > -1; i--) {
-            allChildrens[i].innerHTML = '';
-            allChildrens[i].style.backgroundColor = '#808080';
-            allChildrens[i].style.backgroundImage = 'unset';
-            allChildrens[i].classList.remove('open');
-            allChildrens[i].classList.add('close');
-            allChildrens[i].dataset.suitGroup = '';
-            allChildrens[i].dataset.suit = '';
-            allChildrens[i].dataset.rank = '';
-        }
     }
     addBackgroundImage(card) {
         let suit = card.dataset.suit;
@@ -279,14 +261,11 @@ export default class Game {
         card.dataset.rank = this.CARDS_SETTINGS[Number(card.dataset.id) + 1].RANK;
         card.dataset.suit = this.CARDS_SETTINGS[Number(card.dataset.id) + 1].SUIT;
         card.dataset.suitGroup = this.CARDS_SETTINGS[Number(card.dataset.id) + 1].SUIT_GROUP;
-        card.style.backgroundColor = `${card.dataset.suitGroup}`;
-
     }
     checkCardsInCell(card, parent, clone, gameCell) {
         if (this.isAnimating) return;
         const childs = parent.childNodes;
         const lastChild = childs[childs.length - 1]
-        console.log(1)
         if(lastChild != undefined) {
             if(gameCell) {
                 if(card.dataset.suitGroup != lastChild.dataset.suitGroup && Number(lastChild.dataset.rank) - Number(card.dataset.rank) == 1) {
@@ -366,18 +345,31 @@ export default class Game {
     }
     returnCards(e) {
         if (this.isAnimating) return;
-        if(closeCardsContainer.children.length == 0){
-            const allChildrens = openCardsContainer.childNodes;
-            for (let i = allChildrens.length - 1; i > -1; i--) {
-                allChildrens[i].style.pointerEvents = "none";
-                closeCardsContainer.appendChild(allChildrens[i]);
-            }
-            console.log('sfgfgdfg')
-            this.closeCard();
-            this.checkColumn(closeCardsContainer, false)
-        }else {
-            console.log(e.currentTarget)
-            this.moveToOpenContainer(e.currentTarget)
+
+        if (closeCardsContainer.children.length > 0) {
+            this.moveToOpenContainer(closeCardsContainer);
+            return;
+        }
+
+        if (openCardsContainer.children.length > 0) {
+            const cards = [...openCardsContainer.childNodes].reverse();
+
+            cards.forEach(card => {
+                if (!card.classList?.contains('card')) return;
+
+                card.style.pointerEvents = 'none';
+                card.classList.remove('open');
+                card.classList.add('close');
+                card.innerHTML = '';
+                card.style.backgroundColor = '#808080';
+                card.style.backgroundImage = 'unset';
+                card.dataset.suitGroup = '';
+                card.dataset.suit = '';
+                card.dataset.rank = '';
+                closeCardsContainer.appendChild(card);
+            });
+
+            this.checkColumn(closeCardsContainer, false);
         }
     }
     shuffleCards(){

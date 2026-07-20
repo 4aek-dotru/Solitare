@@ -3,24 +3,55 @@
     padding: unset;
     user-select: none;
 }
+
 button {
     cursor: pointer;
+    font-family: 'Segoe UI', 'Arial', sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+    background-color: rgba(255, 255, 255, 0.5);
+    color: #3D3A38;
+    backdrop-filter: blur(4px);
 }
+
+button:hover {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+button:active {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
 body {
     display: flex;
     height: 100vh;
     width: 100vw;
     flex-direction: column;
     justify-content: space-between;
+    overflow: hidden;
+    background-color: #D4C9BE;
 }
+
 header {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100vw;
     height: 100px;
-    background: #00000059;
+    background: rgba(0, 0, 0, 0.08);
+    backdrop-filter: blur(8px);
 }
+
+header h1 {
+    color: #3D3A38;
+    font-weight: 300;
+    letter-spacing: 6px;
+    font-size: 28px;
+}
+
 main {
     display: flex;
     flex-direction: column;
@@ -29,28 +60,82 @@ main {
     width: 100vw;
     height: 100%;
 }
+
 footer {
     display: flex;
     justify-content: center;
     padding: 30px;
+    gap: 12px;
 }
+
+/* ---- Все кнопки в футере ---- */
+footer button {
+    padding: 10px 28px;
+    font-size: 14px;
+    background-color: rgba(255, 255, 255, 0.35);
+    color: #3D3A38;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+}
+
+footer button:hover {
+    background-color: rgba(255, 255, 255, 0.6);
+}
+
+/* ---- Главное меню (контейнер) ---- */
 #main-container {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 20px;
-    padding: 30px;
-    border: 1px solid black;
-    border-radius: 20px;
+    gap: 14px;
+    padding: 40px 50px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(8px);
 }
+
 #main-container > button {
-    width: 170px;
-    padding: 20px;
-    border: 1px solid black;
-    border-radius: 10px;
-    font-size: 20px;
+    width: 180px;
+    padding: 16px 24px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    font-size: 17px;
+    font-weight: 400;
+    background-color: rgba(255, 255, 255, 0.4);
+    color: #3D3A38;
+    transition: background-color 0.2s ease;
 }
+
+#main-container > button:hover {
+    background-color: rgba(255, 255, 255, 0.75);
+}
+
+#main-container > button:active {
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* ---- Кнопка Играть (чуть заметнее) ---- */
+#start-game-button {
+    background-color: rgba(255, 255, 255, 0.6);
+    font-weight: 500;
+}
+
+#start-game-button:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+}
+
+/* ---- Кнопка Правила ---- */
+#rules-button {
+    background-color: rgba(255, 255, 255, 0.3);
+}
+
+#rules-button:hover {
+    background-color: rgba(255, 255, 255, 0.65);
+}
+
+/* ---- Правила (контейнер) ---- */
 #rules-container {
     display: none;
     flex-direction: column;
@@ -58,108 +143,162 @@ footer {
     flex-wrap: wrap;
     max-width: 400px;
     padding: 30px;
-    border: 1px solid black;
-    border-radius: 20px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    color: #3D3A38;
 }
-#main-menu-button, #main-menu-from-game-button {
+
+#rules-container h1,
+#rules-container h3 {
+    font-weight: 400;
+}
+
+#rules-container li {
+    list-style: none;
+    padding: 4px 0;
+}
+
+/* ---- Кнопки Назад и В меню (внизу) ---- */
+#main-menu-button, 
+#main-menu-from-game-button {
     display: none;
-    justify-content: center;
-    align-items: center;
-    width: 120px;
-    padding: 15px;
-    border: 1px solid black;
-    border-radius: 10px;
-    font-size: 15px;
+    background-color: rgba(255, 255, 255, 0.25);
+    color: #3D3A38;
+    padding: 10px 24px;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 400;
+    transition: background-color 0.2s ease;
 }
+
+#main-menu-button:hover,
+#main-menu-from-game-button:hover {
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+/* ---- Игровое поле ---- */
 #game-container {
     display: none;
     flex-direction: column;
     gap: 70px;
     height: 600px;
 }
+
 #header-game-container {
     display: flex;
     justify-content: space-between;
 }
+
 #deck-container {
     display: flex;
     gap: 10px;
 }
-#close-cards, #open-cards, .card-slot, .game-cell {
+
+#close-cards, 
+#open-cards, 
+.card-slot, 
+.game-cell {
     position: relative;
     width: 90px;
     height: 130px;
-    border-radius: 10px;
+    border-radius: 5px;
 }
-#close-cards:empty, #open-cards:empty, .card-slot:empty, .game-cell:empty {
-    outline: 1px dashed black;
+
+#close-cards:empty, 
+#open-cards:empty, 
+.card-slot:empty, 
+.game-cell:empty {
+    outline: 1px dashed rgba(0, 0, 0, 0.2);
 }
-#card-slots, #main-game-container {
+
+#card-slots, 
+#main-game-container {
     display: flex;
     gap: 10px;
 }
+
 .card {
     position: absolute;
     width: 90px;
     height: 130px;
     border-radius: 5px;
-    border: 1px solid #000000;
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    background: #FDFBF9;
 }
+
 .close {
-    background: #808080;
+    background: #B8AFA6;
+    border: 1px solid rgba(0, 0, 0, 0.1);
     pointer-events: none;
 }
+
 .open {
     pointer-events: auto;
-    background: #0000ff;
-    /* animation: openCard 0.5s; */
 }
+
+/* ---- Меню победы (фон) ---- */
 #end-game-container {
     position: absolute;
     display: none;
     justify-content: center;
     align-items: center;
-    background-color: #00000054;
+    background-color: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(4px);
     width: 100vw;
     height: 100vh;
     z-index: 100000;
 }
+
+/* ---- Меню победы (карточка) ---- */
 #end-game-menu {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    gap: 15px;
-    border: #000000;
-    border-radius: 20px;
-    background-color: #464646f3;
-    padding: 20px;
-    width: 250px;
+    gap: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(12px);
+    padding: 30px;
+    width: 280px;
     height: 300px;
 }
+
 #end-game-menu > h1 {
     text-align: center;
-    color: #ffffff;
+    color: #3D3A38;
+    font-weight: 300;
+    letter-spacing: 1px;
+    font-size: 24px;
 }
+
 #end-game-menu > button {
-    background-color: rgba(110, 110, 110, 0.466);
-    border: none;
-    border-bottom: 1px solid black;
-    border-radius: 10px;
+    background-color: rgba(255, 255, 255, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 150px;
-    height: 50px;
+    width: 160px;
+    height: 48px;
     font-size: 15px;
-    color: white;
+    font-weight: 400;
+    color: #3D3A38;
+    transition: background-color 0.2s ease;
 }
+
 #end-game-menu > button:hover {
-    transform: translateY(-1px);
+    background-color: rgba(255, 255, 255, 0.6);
 }
+
 #end-game-menu > button:active {
-    box-shadow: inset 0 0 5px rgb(0 0 0 / 0.5);
+    background-color: rgba(255, 255, 255, 0.15);
 }
+
 @keyframes openCard {
     0% {
         width: 90px;
