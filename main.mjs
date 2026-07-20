@@ -4,7 +4,19 @@ const rulesContainer = document.getElementById('rules-container');
 const gameContainer = document.getElementById('game-container');
 const endGameContainer = document.getElementById('end-game-container');
 let _game;
+function preloadCardImages() {
+    const suits = ['clubs', 'spades', 'hearts', 'diamonds'];
+    const ranks = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13'];
+    
+    suits.forEach(suit => {
+        ranks.forEach(rank => {
+            const img = new Image();
+            img.src = `images/${rank}_of_${suit}.png`;
+        });
+    });
+}
 
+preloadCardImages();
 document.getElementById('rules-button').addEventListener('click', () => {
     mainContainer.style.display = 'none';
     rulesContainer.style.display = 'flex';
